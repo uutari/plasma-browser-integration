@@ -201,9 +201,9 @@ void MPrisPlugin::handleData(const QString &event, const QJsonObject &data)
         emitPropertyChange(m_player, "Rate");
     } else if (event == QLatin1String("seeking") || event == QLatin1String("seeked")) {
         // seeked is explicit user interaction, signal a change on dbus
-        const qreal position = data.value(QStringLiteral("currentTime")).toDouble();
-        // FIXME actually invoke "Seeked" signal
-        setPosition(position * 1000 * 1000);
+        const qreal position = data.value(QStringLiteral("currentTime")).toDouble() * 1000 * 1000;
+        Q_EMIT(((MPrisPlayer *) m_player)->Seeked((qlonglong) position));
+        setPosition(position);
     } else if (event == QLatin1String("volumechange")) {
         m_volume = data.value(QStringLiteral("volume")).toDouble(1);
         emitPropertyChange(m_player, "Volume");
@@ -536,7 +536,9 @@ void MPrisPlugin::Play()
 
 void MPrisPlugin::Seek(qlonglong offset)
 {
-    Q_UNUSED(offset);
+    sendData(QStringLiteral("seek"), {
+        {QStringLiteral("offset"), offset / 1000.0 / 1000.0
+    } });
 }
 
 void MPrisPlugin::SetPosition(const QDBusObjectPath &path, qlonglong position)

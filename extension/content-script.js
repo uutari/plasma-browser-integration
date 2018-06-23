@@ -158,6 +158,16 @@ addCallback("mpris", "previous", function () {
     }
 });
 
+addCallback("mpris", "seek", function (message) {
+    if (activePlayer) {
+        if (!activePlayer.seekable) {
+            console.warn("Got seek command, but player is not seekable");
+            return;
+        }
+        activePlayer.currentTime += message.offset;
+    }
+});
+
 addCallback("mpris", "setPosition", function (message) {
     if (activePlayer) {
         activePlayer.currentTime = message.position;

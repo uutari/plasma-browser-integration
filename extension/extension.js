@@ -231,6 +231,18 @@ addCallback("mpris", "setLoop", function (message) {
     }
 });
 
+addCallback("mpris", "seek", function (message) {
+    if (currentPlayerTabId) {
+        chrome.tabs.sendMessage(currentPlayerTabId, {
+            subsystem: "mpris",
+            action: "seek",
+            payload: {
+                offset: message.offset
+            }
+        });
+    }
+})
+
 addCallback("mpris", "setPosition", function (message) {
     if (currentPlayerTabId) {
         chrome.tabs.sendMessage(currentPlayerTabId, {
